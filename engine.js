@@ -222,6 +222,7 @@ class SolitaireEngine {
         const newTop = remainingCol[remainingCol.length - 1];
         if (!newTop.faceUp) {
           newTop.faceUp = true;
+          newTop.justFlipped = true;
           cardFlipped = true;
           flippedCard = newTop;
           this.score += 5; // Reward for flipping card

@@ -368,17 +368,26 @@ class SolitaireUI {
         cardEl.style.zIndex = idx + 1;
 
         if (card.faceUp) {
+          if (card.justFlipped) {
+            cardEl.classList.add('just-flipped');
+            card.justFlipped = false;
+          }
           this.attachCardInteractivity(cardEl, { area: 'tableau', col: colIdx, cardIndex: idx });
           currentTop += cardUpOffset;
         } else {
           currentTop += cardDownOffset;
-          // If face-down card is somehow top card, click to flip
+          // If face-down card is the top card of the column, click or tap to flip it
           if (idx === pile.length - 1) {
-            cardEl.addEventListener('click', () => {
+            cardEl.style.cursor = 'pointer';
+            const flipCard = (e) => {
+              e.stopPropagation();
               card.faceUp = true;
+              card.justFlipped = true;
               sound.playCardFlip();
               this.render();
-            });
+            };
+            cardEl.addEventListener('click', flipCard);
+            cardEl.addEventListener('pointerup', flipCard);
           }
         }
 

@@ -353,8 +353,34 @@ body {
   width: 100%;
   height: 100%;
   border-radius: var(--card-radius);
-  backface-visibility: hidden;
   box-sizing: border-box;
+}
+
+/* Card Face Visibility */
+.card.face-up .card-back {
+  display: none !important;
+}
+
+.card.face-up .card-front {
+  display: flex !important;
+}
+
+.card.face-down .card-front {
+  display: none !important;
+}
+
+.card.face-down .card-back {
+  display: block !important;
+}
+
+/* Smooth Flip Animation */
+@keyframes cardFlipIn {
+  0% { transform: scaleX(0.2); opacity: 0.7; }
+  100% { transform: scaleX(1); opacity: 1; }
+}
+
+.card.just-flipped {
+  animation: cardFlipIn 0.22s ease-out;
 }
 
 /* Card Front */
