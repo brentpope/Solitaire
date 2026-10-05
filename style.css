@@ -1,0 +1,902 @@
+/* ==========================================================================
+   Klondike Solitaire - Modern Responsive Styles (Desktop & Mobile / iPhone)
+   ========================================================================== */
+
+:root {
+  --felt-green: #155724;
+  --felt-green-grad: radial-gradient(ellipse at center, #1b6326 0%, #0e3d16 100%);
+  --card-width: clamp(44px, 12vw, 98px);
+  --card-height: calc(var(--card-width) * 1.42);
+  --card-radius: calc(var(--card-width) * 0.08);
+  --font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --red-suit-color: #d32f2f;
+  --black-suit-color: #1a1a1a;
+  --gold-accent: #fbc02d;
+}
+
+/* Themes */
+body.theme-green {
+  background: var(--felt-green-grad);
+}
+body.theme-blue {
+  background: radial-gradient(ellipse at center, #16385d 0%, #091d33 100%);
+}
+body.theme-burgundy {
+  background: radial-gradient(ellipse at center, #4f152d 0%, #260614 100%);
+}
+body.theme-dark {
+  background: radial-gradient(ellipse at center, #262c36 0%, #11141a 100%);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden;
+  font-family: var(--font-family);
+  color: #ffffff;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  min-height: 100dvh;
+  position: relative;
+  background-attachment: fixed;
+}
+
+/* ==========================================================================
+   Header & Action Bar
+   ========================================================================== */
+
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: max(10px, env(safe-area-inset-top)) 16px 8px 16px;
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  z-index: 10;
+}
+
+.brand-section {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.brand-logo {
+  font-size: 1.4rem;
+  line-height: 1;
+}
+
+.brand-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  background: linear-gradient(135deg, #ffffff 40%, #e0e0e0 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Game Stats Bar */
+.game-stats {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: rgba(0, 0, 0, 0.25);
+  padding: 4px 14px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.88rem;
+}
+
+.stat-label {
+  color: rgba(255, 255, 255, 0.7);
+  text-transform: uppercase;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.stat-value {
+  font-weight: 700;
+  color: #fff;
+  min-width: 32px;
+}
+
+/* Controls */
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  font-size: 0.86rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+  outline: none;
+}
+
+.btn:hover {
+  background: rgba(255, 255, 255, 0.22);
+  border-color: rgba(255, 255, 255, 0.35);
+  transform: translateY(-1px);
+}
+
+.btn:active {
+  transform: translateY(1px);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.btn-icon-only {
+  padding: 6px;
+  border-radius: 50%;
+  width: 34px;
+  height: 34px;
+}
+
+.btn-accent {
+  background: #fbc02d;
+  color: #121212;
+  border-color: #fdd835;
+  box-shadow: 0 0 10px rgba(251, 192, 45, 0.4);
+  animation: pulse-attention 1.6s infinite;
+}
+
+.btn-accent:hover {
+  background: #ffd54f;
+  color: #000;
+}
+
+@keyframes pulse-attention {
+  0%, 100% { box-shadow: 0 0 8px rgba(251, 192, 45, 0.3); }
+  50% { box-shadow: 0 0 18px rgba(251, 192, 45, 0.8); }
+}
+
+/* ==========================================================================
+   Playfield & Piles Layout
+   ========================================================================== */
+
+.game-board {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 12px 10px 80px 10px;
+  gap: 16px;
+  box-sizing: border-box;
+}
+
+/* Top Area: Stock/Waste on left, Foundations on right */
+.board-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  width: 100%;
+}
+
+.stock-waste-group, .foundations-group {
+  display: flex;
+  gap: clamp(6px, 1.6vw, 14px);
+}
+
+/* Tableau Columns Area */
+.board-tableau {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: clamp(6px, 1.6vw, 14px);
+  width: 100%;
+  min-height: 480px;
+}
+
+/* ==========================================================================
+   Card Slots & Piles
+   ========================================================================== */
+
+.card-pile {
+  width: var(--card-width);
+  height: var(--card-height);
+  border-radius: var(--card-radius);
+  position: relative;
+  border: 2px dashed rgba(255, 255, 255, 0.25);
+  background: rgba(0, 0, 0, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  box-sizing: border-box;
+}
+
+.tableau-column {
+  width: var(--card-width);
+  min-height: var(--card-height);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.tableau-column.empty {
+  border: 2px dashed rgba(255, 255, 255, 0.2);
+  border-radius: var(--card-radius);
+  background: rgba(0, 0, 0, 0.08);
+  height: var(--card-height);
+}
+
+.tableau-empty-slot {
+  font-size: calc(var(--card-width) * 0.4);
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.25);
+}
+
+.foundation-watermark {
+  width: 60%;
+  height: 60%;
+  opacity: 0.28;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.foundation-watermark.red {
+  color: #ff5252;
+}
+
+.foundation-watermark.black {
+  color: #ffffff;
+}
+
+.foundation-watermark svg {
+  width: 100%;
+  height: 100%;
+}
+
+.recycle-indicator {
+  color: rgba(255, 255, 255, 0.45);
+  cursor: pointer;
+  transition: transform 0.3s ease, color 0.2s;
+}
+
+.recycle-indicator:hover {
+  color: #ffffff;
+  transform: rotate(45deg);
+}
+
+.pile-badge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: #fbc02d;
+  color: #1a1a1a;
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  z-index: 10;
+  pointer-events: none;
+}
+
+/* Drop Target Highlights */
+.drop-highlight {
+  border-color: #fbc02d !important;
+  box-shadow: 0 0 16px rgba(251, 192, 45, 0.7) !important;
+  transform: scale(1.03);
+}
+
+/* ==========================================================================
+   Card Styling
+   ========================================================================== */
+
+.card {
+  width: var(--card-width);
+  height: var(--card-height);
+  border-radius: var(--card-radius);
+  position: absolute;
+  cursor: pointer;
+  touch-action: none;
+  perspective: 1000px;
+  transition: transform 0.12s ease-out, box-shadow 0.12s;
+}
+
+.card.face-up {
+  cursor: grab;
+}
+
+.card:active {
+  cursor: grabbing;
+}
+
+.card-inner {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  border-radius: var(--card-radius);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.28), 0 1px 2px rgba(0, 0, 0, 0.18);
+  transition: box-shadow 0.2s;
+}
+
+.card-face {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: var(--card-radius);
+  backface-visibility: hidden;
+  box-sizing: border-box;
+}
+
+/* Card Front */
+.card-front {
+  background: #ffffff;
+  border: 1px solid #d5d5d5;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: calc(var(--card-width) * 0.05);
+  overflow: hidden;
+}
+
+.card-front.red {
+  color: var(--red-suit-color);
+}
+
+.card-front.black {
+  color: var(--black-suit-color);
+}
+
+.card-corner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 0.9;
+  width: calc(var(--card-width) * 0.26);
+}
+
+.corner-top {
+  align-self: flex-start;
+}
+
+.corner-bottom {
+  align-self: flex-end;
+  transform: rotate(180deg);
+}
+
+.corner-rank {
+  font-size: calc(var(--card-width) * 0.24);
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+
+.corner-suit {
+  width: calc(var(--card-width) * 0.18);
+  height: calc(var(--card-width) * 0.18);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.corner-suit svg {
+  width: 100%;
+  height: 100%;
+}
+
+.card-center {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+/* Ace Center Pip */
+.pip-layout-ace .ace-pip svg {
+  width: calc(var(--card-width) * 0.44);
+  height: calc(var(--card-width) * 0.44);
+}
+
+/* Number Card Pips */
+.card-pips {
+  width: 62%;
+  height: 64%;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-around;
+}
+
+.pip svg {
+  width: calc(var(--card-width) * 0.19);
+  height: calc(var(--card-width) * 0.19);
+}
+
+/* Royal Court Cards (Jack, Queen, King) */
+.court-artwork {
+  width: 68%;
+  height: 70%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.court-svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* ==========================================================================
+   Card Back Patterns
+   ========================================================================== */
+
+.card-back {
+  background: #ffffff;
+  border: 1px solid #c2c2c2;
+  padding: calc(var(--card-width) * 0.05);
+}
+
+.card-back-pattern {
+  width: 100%;
+  height: 100%;
+  border-radius: calc(var(--card-radius) * 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Red Back (Default) */
+[data-card-back="red"] .card-back-pattern,
+.card-back-pattern {
+  background-color: #b71c1c;
+  background-image: 
+    radial-gradient(#d32f2f 15%, transparent 16%), 
+    radial-gradient(#9a0007 15%, transparent 16%);
+  background-size: 10px 10px;
+  background-position: 0 0, 5px 5px;
+  border: 2px solid #ffffff;
+}
+
+/* Blue Back */
+[data-card-back="blue"] .card-back-pattern {
+  background-color: #0d47a1;
+  background-image: 
+    radial-gradient(#1976d2 15%, transparent 16%), 
+    radial-gradient(#002171 15%, transparent 16%);
+  background-size: 10px 10px;
+  background-position: 0 0, 5px 5px;
+  border: 2px solid #ffffff;
+}
+
+/* Obsidian Gold Back */
+[data-card-back="gold"] .card-back-pattern {
+  background-color: #1a1a1a;
+  background-image: 
+    radial-gradient(#fbc02d 15%, transparent 16%), 
+    radial-gradient(#c49000 15%, transparent 16%);
+  background-size: 10px 10px;
+  background-position: 0 0, 5px 5px;
+  border: 2px solid #fbc02d;
+}
+
+/* Emerald Back */
+[data-card-back="emerald"] .card-back-pattern {
+  background-color: #1b5e20;
+  background-image: 
+    radial-gradient(#388e3c 15%, transparent 16%), 
+    radial-gradient(#003300 15%, transparent 16%);
+  background-size: 10px 10px;
+  background-position: 0 0, 5px 5px;
+  border: 2px solid #ffffff;
+}
+
+.card-back-border {
+  width: 82%;
+  height: 86%;
+  border: 1px dashed rgba(255, 255, 255, 0.6);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card-back-center-glyph {
+  width: 22px;
+  height: 22px;
+  border: 2px solid rgba(255, 255, 255, 0.7);
+  transform: rotate(45deg);
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Card in stock */
+.in-stock {
+  top: 0;
+  left: 0;
+}
+
+/* Card in waste pile */
+#waste-pile .card {
+  top: 0;
+  left: 0;
+}
+
+/* Card in foundation */
+.foundation-slot .card {
+  top: 0;
+  left: 0;
+}
+
+/* ==========================================================================
+   Dragging Ghost Container
+   ========================================================================== */
+
+.drag-ghost {
+  position: fixed;
+  pointer-events: none;
+  z-index: 1000;
+  width: var(--card-width);
+  height: var(--card-height);
+  filter: drop-shadow(0 14px 24px rgba(0, 0, 0, 0.45));
+  transform: rotate(1.5deg) scale(1.04);
+  transition: transform 0.05s ease-out;
+}
+
+.drag-ghost .card {
+  position: absolute;
+  left: 0;
+}
+
+/* ==========================================================================
+   Animations & Cues
+   ========================================================================== */
+
+/* Invalid move shake */
+.invalid-shake {
+  animation: shake 0.36s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+@keyframes shake {
+  10%, 90% { transform: translate3d(-3px, 0, 0); }
+  20%, 80% { transform: translate3d(5px, 0, 0); }
+  30%, 50%, 70% { transform: translate3d(-5px, 0, 0); }
+  40%, 60% { transform: translate3d(3px, 0, 0); }
+}
+
+/* Hint pulse */
+.hint-pulse {
+  animation: hint-glow 1s infinite alternate !important;
+}
+
+@keyframes hint-glow {
+  0% { box-shadow: 0 0 4px #fbc02d; transform: scale(1); }
+  100% { box-shadow: 0 0 20px #fbc02d; transform: scale(1.05); }
+}
+
+.hint-target-pulse {
+  animation: hint-target-glow 1s infinite alternate !important;
+}
+
+@keyframes hint-target-glow {
+  0% { border-color: #00e676; box-shadow: 0 0 4px #00e676; }
+  100% { border-color: #00e676; box-shadow: 0 0 20px #00e676; }
+}
+
+/* ==========================================================================
+   Mobile Bottom Quick Navigation Bar (iPhone Friendly)
+   ========================================================================== */
+
+.mobile-bottom-bar {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(18, 18, 18, 0.88);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  padding: 8px 16px max(12px, env(safe-area-inset-bottom)) 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  justify-content: space-around;
+  align-items: center;
+  z-index: 100;
+}
+
+.mobile-bar-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.68rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  cursor: pointer;
+  border-radius: 8px;
+}
+
+.mobile-bar-btn svg {
+  width: 22px;
+  height: 22px;
+}
+
+.mobile-bar-btn:active {
+  color: #fbc02d;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* ==========================================================================
+   Modals
+   ========================================================================== */
+
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2000;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal.active {
+  display: flex;
+}
+
+.modal-backdrop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.modal-content {
+  position: relative;
+  background: #1e242b;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 16px;
+  width: 90%;
+  max-width: 440px;
+  padding: 24px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+  z-index: 10;
+  color: #ffffff;
+  animation: modal-pop 0.22s ease-out;
+}
+
+@keyframes modal-pop {
+  0% { opacity: 0; transform: scale(0.92); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+
+.modal-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 1.6rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.modal-close:hover {
+  color: #fff;
+}
+
+.modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Settings Form */
+.form-group {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.form-group label {
+  font-size: 0.94rem;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.form-select {
+  background: #2a323d;
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 0.88rem;
+  outline: none;
+}
+
+/* Mobile Share QR Container */
+.qr-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 0;
+}
+
+#mobile-qr-code {
+  background: #ffffff;
+  padding: 12px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+.qr-instructions {
+  font-size: 0.88rem;
+  color: rgba(255, 255, 255, 0.8);
+  line-height: 1.45;
+  text-align: center;
+}
+
+.qr-instructions ol {
+  text-align: left;
+  margin: 8px 0 0 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.url-box {
+  background: rgba(0, 0, 0, 0.4);
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-family: monospace;
+  font-size: 0.9rem;
+  color: #fbc02d;
+  word-break: break-all;
+  text-decoration: none;
+}
+
+/* Win Modal */
+.win-stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin: 16px 0;
+}
+
+.win-stat-card {
+  background: rgba(255, 255, 255, 0.06);
+  padding: 12px;
+  border-radius: 10px;
+  text-align: center;
+}
+
+.win-stat-card .val {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #fbc02d;
+  margin-top: 4px;
+}
+
+.win-stat-card .lbl {
+  font-size: 0.74rem;
+  color: rgba(255, 255, 255, 0.6);
+  text-transform: uppercase;
+}
+
+/* Win Canvas */
+#win-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1500;
+  display: none;
+  cursor: pointer;
+}
+
+/* ==========================================================================
+   Responsive Breakpoints (Mobile / iPhone)
+   ========================================================================== */
+
+@media (max-width: 768px) {
+  .header-actions .btn-label {
+    display: none;
+  }
+
+  .header-actions .btn {
+    padding: 6px;
+    border-radius: 50%;
+    width: 34px;
+    height: 34px;
+  }
+
+  .brand-title {
+    font-size: 1rem;
+  }
+
+  .stat-item {
+    font-size: 0.8rem;
+    gap: 4px;
+  }
+
+  .stat-label {
+    font-size: 0.65rem;
+  }
+
+  .game-board {
+    padding-bottom: 90px;
+    padding-top: 8px;
+    gap: 12px;
+  }
+
+  /* Show thumb-friendly bottom bar on mobile */
+  .mobile-bottom-bar {
+    display: flex;
+  }
+}
+
+@media (max-width: 480px) {
+  .game-stats {
+    padding: 3px 8px;
+    gap: 8px;
+  }
+
+  .stat-value {
+    min-width: 22px;
+  }
+}

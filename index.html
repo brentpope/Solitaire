@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Klondike Solitaire</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="description" content="Classic Klondike Solitaire for Desktop PC and iPhone. Offline support, fluid drag-and-drop, tap-to-move, and classic win animation.">
+  <meta name="theme-color" content="#155724">
+
+  <!-- iOS Safari Web App Support -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Solitaire">
+  <link rel="apple-touch-icon" href="icon-192.png">
+
+  <!-- PWA Web App Manifest -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="theme-green">
+
+  <!-- Canvas for classic cascading victory bounce -->
+  <canvas id="win-canvas"></canvas>
+
+  <!-- Top Navigation & Stats Bar -->
+  <header class="app-header">
+    <div class="brand-section">
+      <span class="brand-logo">♠</span>
+      <h1 class="brand-title">Solitaire</h1>
+    </div>
+
+    <!-- Stats -->
+    <div class="game-stats">
+      <div class="stat-item">
+        <span class="stat-label">Score</span>
+        <span class="stat-value" id="score-val">0</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-label">Moves</span>
+        <span class="stat-value" id="moves-val">0</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-label">Time</span>
+        <span class="stat-value" id="time-val">00:00</span>
+      </div>
+    </div>
+
+    <!-- Controls -->
+    <div class="header-actions">
+      <!-- Auto Complete (Hidden until winnable) -->
+      <button id="btn-auto-complete" class="btn btn-accent" style="display: none;" title="Auto complete remaining cards">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+          <path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z"/>
+        </svg>
+        <span class="btn-label">Auto Win</span>
+      </button>
+
+      <button id="btn-undo" class="btn" title="Undo Move (Ctrl+Z)">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+          <path d="M12.5 8c-2.65 0-5.05.99-6.9 2.6L2 7v9h9l-3.62-3.62c1.39-1.16 3.16-1.88 5.12-1.88 3.54 0 6.55 2.31 7.6 5.5l2.37-.78C21.08 11.03 17.15 8 12.5 8z"/>
+        </svg>
+        <span class="btn-label">Undo</span>
+      </button>
+
+      <button id="btn-hint" class="btn" title="Show Hint (H)">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+          <path d="M9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1zm3-19C8.14 2 5 5.14 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.86-3.14-7-7-7z"/>
+        </svg>
+        <span class="btn-label">Hint</span>
+      </button>
+
+      <button id="btn-new-game" class="btn" title="Start New Game (N)">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+          <path d="M17.65 6.35A7.958 7.958 0 0 0 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0 1 12 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
+        </svg>
+        <span class="btn-label">New Game</span>
+      </button>
+
+      <button id="btn-sound-toggle" class="btn btn-icon-only" title="Toggle Sound">
+        <!-- Icon injected via JS -->
+      </button>
+
+      <button id="btn-share-mobile" class="btn btn-icon-only" title="Play on iPhone / Share via QR Code">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+          <path d="M17 1.01L7 1c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-1.99-2-1.99zM17 19H7V5h10v14zm-4.2-7.2h2.4v2.4h-2.4v-2.4zm0-4h2.4v2.4h-2.4V7.8zm-4 4h2.4v2.4H8.8v-2.4zm0-4h2.4v2.4H8.8V7.8z"/>
+        </svg>
+      </button>
+
+      <button id="btn-settings" class="btn btn-icon-only" title="Game Settings">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+          <path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Solitaire Game Area -->
+  <main class="game-board">
+    <!-- Top Area: Stock, Waste, and 4 Foundations -->
+    <div class="board-top">
+      <!-- Stock & Waste Piles (Left) -->
+      <div class="stock-waste-group">
+        <div id="stock-pile" class="card-pile stock-slot" title="Click to Draw (D)"></div>
+        <div id="waste-pile" class="card-pile waste-slot"></div>
+      </div>
+
+      <!-- Foundation Piles (Right: Spades, Hearts, Clubs, Diamonds) -->
+      <div class="foundations-group">
+        <div id="foundation-0" class="card-pile foundation-slot" data-suit="spades"></div>
+        <div id="foundation-1" class="card-pile foundation-slot" data-suit="hearts"></div>
+        <div id="foundation-2" class="card-pile foundation-slot" data-suit="clubs"></div>
+        <div id="foundation-3" class="card-pile foundation-slot" data-suit="diamonds"></div>
+      </div>
+    </div>
+
+    <!-- Bottom Area: 7 Tableau Columns -->
+    <div class="board-tableau">
+      <div id="tableau-0" class="tableau-column"></div>
+      <div id="tableau-1" class="tableau-column"></div>
+      <div id="tableau-2" class="tableau-column"></div>
+      <div id="tableau-3" class="tableau-column"></div>
+      <div id="tableau-4" class="tableau-column"></div>
+      <div id="tableau-5" class="tableau-column"></div>
+      <div id="tableau-6" class="tableau-column"></div>
+    </div>
+  </main>
+
+  <!-- Mobile Bottom Quick Navigation Bar (Thumb Friendly on iPhone) -->
+  <nav class="mobile-bottom-bar">
+    <button class="mobile-bar-btn" onclick="window.solitaireApp.handleUndo()">
+      <svg viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12.5 8c-2.65 0-5.05.99-6.9 2.6L2 7v9h9l-3.62-3.62c1.39-1.16 3.16-1.88 5.12-1.88 3.54 0 6.55 2.31 7.6 5.5l2.37-.78C21.08 11.03 17.15 8 12.5 8z"/>
+      </svg>
+      <span>Undo</span>
+    </button>
+    <button class="mobile-bar-btn" onclick="window.solitaireApp.handleHint()">
+      <svg viewBox="0 0 24 24" fill="currentColor">
+        <path d="M9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1zm3-19C8.14 2 5 5.14 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.86-3.14-7-7-7z"/>
+      </svg>
+      <span>Hint</span>
+    </button>
+    <button class="mobile-bar-btn" onclick="window.solitaireApp.startNewGame()">
+      <svg viewBox="0 0 24 24" fill="currentColor">
+        <path d="M17.65 6.35A7.958 7.958 0 0 0 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0 1 12 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
+      </svg>
+      <span>New Game</span>
+    </button>
+    <button class="mobile-bar-btn" onclick="window.solitaireApp.toggleSound()">
+      <svg viewBox="0 0 24 24" fill="currentColor">
+        <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
+      </svg>
+      <span>Sound</span>
+    </button>
+    <button class="mobile-bar-btn" onclick="window.solitaireApp.openModal('settings-modal')">
+      <svg viewBox="0 0 24 24" fill="currentColor">
+        <path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/>
+      </svg>
+      <span>Settings</span>
+    </button>
+  </nav>
+
+  <!-- Settings Modal -->
+  <div id="settings-modal" class="modal">
+    <div class="modal-backdrop"></div>
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">Settings</h2>
+        <button class="modal-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="setting-draw-mode">Draw Mode</label>
+          <select id="setting-draw-mode" class="form-select">
+            <option value="1">Draw 1 (Relaxed)</option>
+            <option value="3">Draw 3 (Classic Challenge)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="setting-theme">Table Felt Color</label>
+          <select id="setting-theme" class="form-select">
+            <option value="green">Classic Casino Green</option>
+            <option value="blue">Midnight Sapphire Blue</option>
+            <option value="burgundy">Royal Velvet Wine</option>
+            <option value="dark">Obsidian Dark</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="setting-card-back">Card Back Style</label>
+          <select id="setting-card-back" class="form-select">
+            <option value="red">Classic Crimson Ornament</option>
+            <option value="blue">Royal Sapphire Star</option>
+            <option value="gold">Obsidian & Gold Foil</option>
+            <option value="emerald">Emerald Casino Tartan</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile Share & QR Code Modal -->
+  <div id="mobile-share-modal" class="modal">
+    <div class="modal-backdrop"></div>
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">📱 Play on iPhone</h2>
+        <button class="modal-close">&times;</button>
+      </div>
+      <div class="modal-body qr-container">
+        <p class="qr-instructions">
+          Scan this QR code with your iPhone Camera to play immediately over your local Wi-Fi:
+        </p>
+
+        <!-- QR Code renders here -->
+        <div id="mobile-qr-code"></div>
+
+        <a id="mobile-url-link" href="#" target="_blank" class="url-box">http://...</a>
+
+        <div class="qr-instructions">
+          <ol>
+            <li>Make sure your iPhone is connected to the same Wi-Fi.</li>
+            <li>Point your iPhone camera at the QR code and tap the link in Safari.</li>
+            <li><strong>Pro-Tip:</strong> In Safari, tap the <strong>Share</strong> button and choose <strong>"Add to Home Screen"</strong> to install it as an app with full offline play!</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Win Modal -->
+  <div id="win-modal" class="modal">
+    <div class="modal-backdrop"></div>
+    <div class="modal-content" style="text-align: center;">
+      <div class="modal-header" style="justify-content: center;">
+        <h2 class="modal-title" style="font-size: 1.6rem; color: #fbc02d;">🎉 Victory!</h2>
+      </div>
+      <div class="modal-body">
+        <p style="font-size: 1.05rem; opacity: 0.9;">Congratulations! You cleared the deck!</p>
+
+        <div class="win-stats-grid">
+          <div class="win-stat-card">
+            <div class="lbl">Time</div>
+            <div class="val" id="win-time">00:00</div>
+          </div>
+          <div class="win-stat-card">
+            <div class="lbl">Moves</div>
+            <div class="val" id="win-moves">0</div>
+          </div>
+          <div class="win-stat-card">
+            <div class="lbl">Score</div>
+            <div class="val" id="win-score">0</div>
+          </div>
+          <div class="win-stat-card">
+            <div class="lbl">Best Score</div>
+            <div class="val" id="win-best-score">0</div>
+          </div>
+        </div>
+
+        <button id="btn-win-play-again" class="btn btn-accent" style="padding: 10px 24px; font-size: 1.05rem; margin-top: 10px;">
+          Play Again
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="qrcode.min.js"></script>
+  <script src="cards.js"></script>
+  <script src="audio.js"></script>
+  <script src="engine.js"></script>
+  <script src="win-animation.js"></script>
+  <script src="ui.js"></script>
+
+  <!-- Service Worker Registration for Offline PWA Play -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js').catch(() => {
+          // Service worker registration optional in non-https/local testing
+        });
+      });
+    }
+  </script>
+</body>
+</html>

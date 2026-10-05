@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <rect x="5" y="5" width="90" height="90" rx="18" fill="#1b6326" stroke="#fbc02d" stroke-width="4"/>
+  <rect x="22" y="18" width="56" height="64" rx="8" fill="#ffffff" stroke="#cccccc" stroke-width="1.5"/>
+  <path fill="#1a1a1a" d="M50 32C46 39 40 42 40 48c0 3.5 3 6 6.5 6 1.8 0 3-.7 3.5-1.5.5.8 1.7 1.5 3.5 1.5 3.5 0 6.5-2.5 6.5-6 0-6-6-9-10-16zm-1.2 21.5L47 57h6l-1.8-3.5c-.4 0-.8 0-1.2 0z"/>
+  <text x="28" y="32" font-family="-apple-system, sans-serif" font-weight="900" font-size="12" fill="#1a1a1a">A</text>
+  <text x="72" y="76" font-family="-apple-system, sans-serif" font-weight="900" font-size="12" fill="#1a1a1a" text-anchor="end">A</text>
+</svg>
