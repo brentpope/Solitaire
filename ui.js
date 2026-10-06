@@ -301,7 +301,9 @@ class SolitaireUI {
       const cardEl = card.renderElement();
       const offsetIndex = i - startIdx;
 
-      cardEl.style.transform = `translateX(${offsetIndex * 18}px)`;
+      const isMobile = window.innerWidth <= 768;
+      const fanOffset = isMobile ? 12 : 18;
+      cardEl.style.transform = `translateX(${offsetIndex * fanOffset}px)`;
       cardEl.style.zIndex = offsetIndex + 1;
 
       // Only the top card is interactive

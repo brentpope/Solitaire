@@ -880,6 +880,14 @@ body {
    ========================================================================== */
 
 @media (max-width: 768px) {
+  :root {
+    --board-padding-x: clamp(4px, 1.2vw, 8px);
+    --column-gap: clamp(3px, 1vw, 6px);
+    --card-width: min(calc((100vw - (var(--board-padding-x) * 2) - (var(--column-gap) * 6)) / 7), 88px);
+    --card-height: calc(var(--card-width) * 1.42);
+    --card-radius: calc(var(--card-width) * 0.08);
+  }
+
   .header-actions .btn-label {
     display: none;
   }
@@ -905,9 +913,33 @@ body {
   }
 
   .game-board {
-    padding-bottom: 90px;
+    padding-left: max(var(--board-padding-x), env(safe-area-inset-left, 0px));
+    padding-right: max(var(--board-padding-x), env(safe-area-inset-right, 0px));
     padding-top: 8px;
-    gap: 12px;
+    padding-bottom: 90px;
+    gap: 10px;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .board-top {
+    width: 100%;
+  }
+
+  .stock-waste-group,
+  .foundations-group {
+    gap: var(--column-gap);
+  }
+
+  .board-tableau {
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: var(--column-gap);
+    width: 100%;
+  }
+
+  .tableau-column {
+    width: 100%;
+    max-width: var(--card-width);
   }
 
   /* Show thumb-friendly bottom bar on mobile */
@@ -917,6 +949,14 @@ body {
 }
 
 @media (max-width: 480px) {
+  :root {
+    --board-padding-x: 4px;
+    --column-gap: 3px;
+    --card-width: calc((100vw - (var(--board-padding-x) * 2) - (var(--column-gap) * 6)) / 7);
+    --card-height: calc(var(--card-width) * 1.42);
+    --card-radius: calc(var(--card-width) * 0.08);
+  }
+
   .game-stats {
     padding: 3px 8px;
     gap: 8px;
