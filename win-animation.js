@@ -59,7 +59,11 @@ class WinAnimation {
       oCtx.lineWidth = 1;
 
       oCtx.beginPath();
-      oCtx.roundRect(0, 0, this.cardWidth, this.cardHeight, radius);
+      if (oCtx.roundRect) {
+        oCtx.roundRect(0, 0, this.cardWidth, this.cardHeight, radius);
+      } else {
+        oCtx.rect(0, 0, this.cardWidth, this.cardHeight);
+      }
       oCtx.fill();
       oCtx.stroke();
 
@@ -194,6 +198,15 @@ class WinAnimation {
       cancelAnimationFrame(this.rafId);
       this.rafId = null;
     }
+    if (this.cardBitmaps.size > 0) {
+      for (const offscreen of this.cardBitmaps.values()) {
+        offscreen.width = 0;
+        offscreen.height = 0;
+      }
+      this.cardBitmaps.clear();
+    }
+    this.bouncingCards = [];
+    this.deckQueue = [];
     if (this.canvas) {
       this.canvas.style.display = 'none';
       this.canvas.style.pointerEvents = 'none';

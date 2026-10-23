@@ -17,7 +17,7 @@
   <link rel="manifest" href="manifest.json">
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
 
-  <link rel="stylesheet" href="style.css?v=3">
+  <link rel="stylesheet" href="style.css?v=4">
 </head>
 <body class="theme-green">
 
@@ -129,6 +129,12 @@
 
   <!-- Mobile Bottom Quick Navigation Bar (Thumb Friendly on iPhone) -->
   <nav class="mobile-bottom-bar">
+    <button id="btn-auto-complete-mobile" class="mobile-bar-btn mobile-auto-win-btn" style="display: none;" title="Auto complete remaining cards">
+      <svg viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z"/>
+      </svg>
+      <span>Auto Win</span>
+    </button>
     <button class="mobile-bar-btn" onclick="window.solitaireApp.handleUndo()">
       <svg viewBox="0 0 24 24" fill="currentColor">
         <path d="M12.5 8c-2.65 0-5.05.99-6.9 2.6L2 7v9h9l-3.62-3.62c1.39-1.16 3.16-1.88 5.12-1.88 3.54 0 6.55 2.31 7.6 5.5l2.37-.78C21.08 11.03 17.15 8 12.5 8z"/>
@@ -266,11 +272,11 @@
 
   <!-- Scripts -->
   <script src="qrcode.min.js"></script>
-  <script src="cards.js?v=2"></script>
-  <script src="audio.js?v=2"></script>
-  <script src="engine.js?v=2"></script>
-  <script src="win-animation.js?v=2"></script>
-  <script src="ui.js?v=3"></script>
+  <script src="cards.js?v=4"></script>
+  <script src="audio.js?v=4"></script>
+  <script src="engine.js?v=4"></script>
+  <script src="win-animation.js?v=4"></script>
+  <script src="ui.js?v=4"></script>
 
   <!-- Service Worker Registration for Offline PWA Play -->
   <script>

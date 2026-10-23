@@ -110,7 +110,9 @@ class Card {
     this.suit = suit; // Spades, Hearts, Clubs, Diamonds object
     this.rank = rank; // 1 - 13
     this.faceUp = false;
+    this.justFlipped = false;
     this.id = `${suit.id}_${rank}`;
+    this.el = null;
   }
 
   get color() {
@@ -130,40 +132,64 @@ class Card {
   }
 
   renderElement() {
-    const cardEl = document.createElement('div');
+    if (!this.el) {
+      const cardEl = document.createElement('div');
+      cardEl.dataset.cardId = this.id;
+      cardEl.dataset.suit = this.suit.id;
+      cardEl.dataset.rank = this.rank;
+      cardEl.setAttribute('role', 'button');
+
+      // Inner card structure
+      const innerEl = document.createElement('div');
+      innerEl.className = 'card-inner';
+
+      // Front face
+      const frontEl = document.createElement('div');
+      frontEl.className = `card-face card-front ${this.color}`;
+      frontEl.innerHTML = this.renderFrontHTML();
+
+      // Back face
+      const backEl = document.createElement('div');
+      backEl.className = 'card-face card-back';
+      backEl.innerHTML = `
+        <div class="card-back-pattern">
+          <div class="card-back-border">
+            <div class="card-back-center-glyph"></div>
+          </div>
+        </div>
+      `;
+
+      innerEl.appendChild(frontEl);
+      innerEl.appendChild(backEl);
+      cardEl.appendChild(innerEl);
+      this.el = cardEl;
+    }
+
+    const cardEl = this.el;
     cardEl.className = `card ${this.faceUp ? 'face-up' : 'face-down'} ${this.color}`;
-    cardEl.dataset.cardId = this.id;
-    cardEl.dataset.suit = this.suit.id;
-    cardEl.dataset.rank = this.rank;
-    cardEl.setAttribute('role', 'button');
     cardEl.setAttribute('tabindex', this.faceUp ? '0' : '-1');
     cardEl.setAttribute('aria-label', this.faceUp ? `${this.rankName} of ${this.suit.name}` : 'Hidden Card');
 
-    // Inner card structure
-    const innerEl = document.createElement('div');
-    innerEl.className = 'card-inner';
-
-    // Front face
-    const frontEl = document.createElement('div');
-    frontEl.className = `card-face card-front ${this.color}`;
-    frontEl.innerHTML = this.renderFrontHTML();
-
-    // Back face
-    const backEl = document.createElement('div');
-    backEl.className = 'card-face card-back';
-    backEl.innerHTML = `
-      <div class="card-back-pattern">
-        <div class="card-back-border">
-          <div class="card-back-center-glyph"></div>
-        </div>
-      </div>
-    `;
-
-    innerEl.appendChild(frontEl);
-    innerEl.appendChild(backEl);
-    cardEl.appendChild(innerEl);
+    // Reset dynamic positioning & interaction state from previous render
+    cardEl.style.top = '';
+    cardEl.style.left = '';
+    cardEl.style.transform = '';
+    cardEl.style.zIndex = '';
+    cardEl.style.opacity = '1';
+    cardEl.style.cursor = '';
+    cardEl.style.position = '';
+    cardEl._source = null;
+    cardEl._flipCard = null;
 
     return cardEl;
+  }
+
+  cloneElement() {
+    const baseEl = this.renderElement();
+    const clone = baseEl.cloneNode(true);
+    clone.style.opacity = '1';
+    clone.style.transform = '';
+    return clone;
   }
 
   renderFrontHTML() {
@@ -220,17 +246,25 @@ class Card {
   }
 }
 
+let MASTER_DECK = null;
+
 /**
- * Creates a standard 52-card deck
+ * Creates (or resets and returns) a standard 52-card deck, reusing Card DOM instances
  */
 function createDeck() {
-  const deck = [];
-  for (const suit of SUIT_LIST) {
-    for (let rank = 1; rank <= 13; rank++) {
-      deck.push(new Card(suit, rank));
+  if (!MASTER_DECK) {
+    MASTER_DECK = [];
+    for (const suit of SUIT_LIST) {
+      for (let rank = 1; rank <= 13; rank++) {
+        MASTER_DECK.push(new Card(suit, rank));
+      }
     }
   }
-  return deck;
+  for (const card of MASTER_DECK) {
+    card.faceUp = false;
+    card.justFlipped = false;
+  }
+  return [...MASTER_DECK];
 }
 
 /**

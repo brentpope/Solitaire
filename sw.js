@@ -2,7 +2,7 @@
  * sw.js - Service Worker for Klondike Solitaire PWA (100% Offline Play)
  */
 
-const CACHE_NAME = 'solitaire-v3';
+const CACHE_NAME = 'solitaire-v4';
 const ASSETS_TO_CACHE = [
   './',
   'index.html',
@@ -47,13 +47,10 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
+  // Network-first with offline cache fallback so updates arrive immediately on Wi-Fi
   event.respondWith(
-    caches.match(event.request).then((cachedResponse) => {
-      if (cachedResponse) {
-        return cachedResponse;
-      }
-      return fetch(event.request).then((networkResponse) => {
-        // Cache the newly fetched resource
+    fetch(event.request)
+      .then((networkResponse) => {
         if (networkResponse && networkResponse.status === 200) {
           const responseToCache = networkResponse.clone();
           caches.open(CACHE_NAME).then((cache) => {
@@ -61,12 +58,16 @@ self.addEventListener('fetch', (event) => {
           });
         }
         return networkResponse;
-      }).catch(() => {
-        // Fallback to cached index.html for navigation
-        if (event.request.mode === 'navigate') {
-          return caches.match('index.html');
-        }
-      });
-    })
+      })
+      .catch(() => {
+        return caches.match(event.request, { ignoreSearch: true }).then((cachedResponse) => {
+          if (cachedResponse) {
+            return cachedResponse;
+          }
+          if (event.request.mode === 'navigate') {
+            return caches.match('index.html', { ignoreSearch: true });
+          }
+        });
+      })
   );
 });

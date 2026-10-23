@@ -33,10 +33,38 @@ class SolitaireUI {
     this.undoBtn = document.getElementById('btn-undo');
     this.hintBtn = document.getElementById('btn-hint');
     this.autoCompleteBtn = document.getElementById('btn-auto-complete');
+    this.autoCompleteMobileBtn = document.getElementById('btn-auto-complete-mobile');
     this.newGameBtn = document.getElementById('btn-new-game');
     this.settingsBtn = document.getElementById('btn-settings');
     this.shareMobileBtn = document.getElementById('btn-share-mobile');
     this.soundToggleBtn = document.getElementById('btn-sound-toggle');
+
+    // Cached static pile helper DOM nodes (avoids innerHTML/SVG recreation on every move)
+    this.stockBadgeEl = document.createElement('div');
+    this.stockBadgeEl.className = 'pile-badge';
+
+    this.recycleIndicatorEl = document.createElement('div');
+    this.recycleIndicatorEl.className = 'recycle-indicator';
+    this.recycleIndicatorEl.title = 'Recycle waste pile';
+    this.recycleIndicatorEl.innerHTML = `
+      <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor">
+        <path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46A7.93 7.93 0 0 0 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74A7.93 7.93 0 0 0 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/>
+      </svg>
+    `;
+
+    this.foundationWatermarks = SUIT_LIST.map(suit => {
+      const wm = document.createElement('div');
+      wm.className = `foundation-watermark ${suit.color}`;
+      wm.innerHTML = SUIT_SVGS[suit.id];
+      return wm;
+    });
+
+    this.tableauEmptySlots = Array.from({ length: 7 }, () => {
+      const slot = document.createElement('div');
+      slot.className = 'tableau-empty-slot';
+      slot.textContent = 'K';
+      return slot;
+    });
 
     // Drag & Drop State
     this.dragState = null;
@@ -71,6 +99,7 @@ class SolitaireUI {
     if (this.undoBtn) this.undoBtn.addEventListener('click', () => this.handleUndo());
     if (this.hintBtn) this.hintBtn.addEventListener('click', () => this.handleHint());
     if (this.autoCompleteBtn) this.autoCompleteBtn.addEventListener('click', () => this.handleAutoComplete());
+    if (this.autoCompleteMobileBtn) this.autoCompleteMobileBtn.addEventListener('click', () => this.handleAutoComplete());
     if (this.settingsBtn) this.settingsBtn.addEventListener('click', () => this.openModal('settings-modal'));
     if (this.shareMobileBtn) this.shareMobileBtn.addEventListener('click', () => this.openMobileShareModal());
     if (this.soundToggleBtn) this.soundToggleBtn.addEventListener('click', () => this.toggleSound());
@@ -225,6 +254,33 @@ class SolitaireUI {
   }
 
   /**
+   * Synchronize container children without detaching/re-inserting unchanged DOM nodes
+   */
+  syncChildren(container, newChildren) {
+    const current = container.children;
+    if (current.length === newChildren.length) {
+      let same = true;
+      for (let i = 0; i < newChildren.length; i++) {
+        if (current[i] !== newChildren[i]) {
+          same = false;
+          break;
+        }
+      }
+      if (same) return;
+    }
+    if (container.replaceChildren) {
+      container.replaceChildren(...newChildren);
+    } else {
+      while (container.firstChild) {
+        container.removeChild(container.firstChild);
+      }
+      for (let i = 0; i < newChildren.length; i++) {
+        container.appendChild(newChildren[i]);
+      }
+    }
+  }
+
+  /**
    * Main Render function: updates the entire board DOM accurately
    */
   render() {
@@ -232,10 +288,12 @@ class SolitaireUI {
     this.movesValEl.textContent = this.engine.moves;
 
     // Check Auto-Complete button visibility
-    if (this.engine.isWinnableAuto() && !this.isAutoSolving && !this.engine.gameWon) {
-      this.autoCompleteBtn.style.display = 'inline-flex';
-    } else {
-      this.autoCompleteBtn.style.display = 'none';
+    const showAutoWin = this.engine.isWinnableAuto() && !this.isAutoSolving && !this.engine.gameWon;
+    if (this.autoCompleteBtn) {
+      this.autoCompleteBtn.style.display = showAutoWin ? 'inline-flex' : 'none';
+    }
+    if (this.autoCompleteMobileBtn) {
+      this.autoCompleteMobileBtn.style.display = showAutoWin ? 'inline-flex' : 'none';
     }
 
     // Render Stock Pile
@@ -257,37 +315,27 @@ class SolitaireUI {
   }
 
   renderStock() {
-    this.stockEl.innerHTML = '';
     if (this.engine.stock.length > 0) {
       this.stockEl.classList.remove('empty');
       // Show card back representing the top of stock
       const stockCard = this.engine.stock[this.engine.stock.length - 1];
       const cardEl = stockCard.renderElement();
       cardEl.classList.add('in-stock');
-      this.stockEl.appendChild(cardEl);
 
       // Stock counter indicator
-      const badge = document.createElement('div');
-      badge.className = 'pile-badge';
-      badge.textContent = this.engine.stock.length;
-      this.stockEl.appendChild(badge);
+      this.stockBadgeEl.textContent = this.engine.stock.length;
+      this.syncChildren(this.stockEl, [cardEl, this.stockBadgeEl]);
     } else {
       this.stockEl.classList.add('empty');
-      this.stockEl.innerHTML = `
-        <div class="recycle-indicator" title="Recycle waste pile">
-          <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor">
-            <path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46A7.93 7.93 0 0 0 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74A7.93 7.93 0 0 0 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/>
-          </svg>
-        </div>
-      `;
+      this.syncChildren(this.stockEl, [this.recycleIndicatorEl]);
     }
   }
 
   renderWaste() {
-    this.wasteEl.innerHTML = '';
     const wasteLen = this.engine.waste.length;
     if (wasteLen === 0) {
       this.wasteEl.classList.add('empty');
+      this.syncChildren(this.wasteEl, []);
       return;
     }
     this.wasteEl.classList.remove('empty');
@@ -295,14 +343,15 @@ class SolitaireUI {
     // In Draw 3 mode, show up to the top 3 cards fanned slightly
     const visibleCount = Math.min(3, wasteLen);
     const startIdx = wasteLen - visibleCount;
+    const isMobile = window.innerWidth <= 768;
+    const fanOffset = isMobile ? 12 : 18;
+    const children = [];
 
     for (let i = startIdx; i < wasteLen; i++) {
       const card = this.engine.waste[i];
       const cardEl = card.renderElement();
       const offsetIndex = i - startIdx;
 
-      const isMobile = window.innerWidth <= 768;
-      const fanOffset = isMobile ? 12 : 18;
       cardEl.style.transform = `translateX(${offsetIndex * fanOffset}px)`;
       cardEl.style.zIndex = offsetIndex + 1;
 
@@ -312,45 +361,43 @@ class SolitaireUI {
         this.attachCardInteractivity(cardEl, { area: 'waste' });
       }
 
-      this.wasteEl.appendChild(cardEl);
+      children.push(cardEl);
     }
+
+    this.syncChildren(this.wasteEl, children);
   }
 
   renderFoundations() {
     for (let fIdx = 0; fIdx < 4; fIdx++) {
       const fEl = this.foundationEls[fIdx];
-      fEl.innerHTML = '';
       const pile = this.engine.foundations[fIdx];
 
       if (pile.length === 0) {
         fEl.classList.add('empty');
-        // Watermark for the suit
-        const suit = SUIT_LIST[fIdx];
-        fEl.innerHTML = `
-          <div class="foundation-watermark ${suit.color}">
-            ${SUIT_SVGS[suit.id]}
-          </div>
-        `;
+        this.syncChildren(fEl, [this.foundationWatermarks[fIdx]]);
       } else {
         fEl.classList.remove('empty');
         // Render top card
         const topCard = pile[pile.length - 1];
         const cardEl = topCard.renderElement();
         this.attachCardInteractivity(cardEl, { area: 'foundation', index: fIdx });
-        fEl.appendChild(cardEl);
+        this.syncChildren(fEl, [cardEl]);
       }
     }
   }
 
   renderTableau() {
+    const isMobile = window.innerWidth <= 768;
+    const cardDownOffset = isMobile ? 12 : 18;
+
     for (let colIdx = 0; colIdx < 7; colIdx++) {
       const colEl = this.tableauEls[colIdx];
-      colEl.innerHTML = '';
       const pile = this.engine.tableau[colIdx];
 
       if (pile.length === 0) {
         colEl.classList.add('empty');
-        colEl.innerHTML = `<div class="tableau-empty-slot">K</div>`;
+        colEl.style.minHeight = '';
+        this.syncChildren(colEl, [this.tableauEmptySlots[colIdx]]);
         continue;
       }
 
@@ -358,11 +405,10 @@ class SolitaireUI {
 
       // Calculate dynamic vertical cascade offset based on pile size to ensure everything fits on mobile
       const totalCards = pile.length;
-      const isMobile = window.innerWidth <= 768;
-      const cardDownOffset = isMobile ? 12 : 18;
       const cardUpOffset = isMobile ? (totalCards > 10 ? 20 : 26) : 32;
 
       let currentTop = 0;
+      const children = [];
 
       pile.forEach((card, idx) => {
         const cardEl = card.renderElement();
@@ -378,23 +424,18 @@ class SolitaireUI {
           currentTop += cardUpOffset;
         } else {
           currentTop += cardDownOffset;
-          // If face-down card is the top card of the column, click or tap to flip it
+          // If face-down card is the top card of the column, tap to flip it
           if (idx === pile.length - 1) {
             cardEl.style.cursor = 'pointer';
-            const flipCard = (e) => {
-              e.stopPropagation();
-              card.faceUp = true;
-              card.justFlipped = true;
-              sound.playCardFlip();
-              this.render();
-            };
-            cardEl.addEventListener('click', flipCard);
-            cardEl.addEventListener('pointerup', flipCard);
+            cardEl._flipCard = card;
+            this.ensureCardListeners(cardEl);
           }
         }
 
-        colEl.appendChild(cardEl);
+        children.push(cardEl);
       });
+
+      this.syncChildren(colEl, children);
 
       // Adjust column height so scrolling or overflow is natural
       colEl.style.minHeight = `${currentTop + 120}px`;
@@ -403,36 +444,47 @@ class SolitaireUI {
 
   /**
    * Attaches pointer, touch, tap-to-move, and double-click handlers to a card
+   * Binds DOM listeners only once per card element to avoid listener accumulation.
    */
   attachCardInteractivity(cardEl, source) {
+    cardEl._source = source;
+    this.ensureCardListeners(cardEl);
+  }
+
+  ensureCardListeners(cardEl) {
+    if (cardEl._listenersBound) return;
+    cardEl._listenersBound = true;
+
     let pointerDownTime = 0;
     let startX = 0;
     let startY = 0;
-    let isDragging = false;
 
     cardEl.addEventListener('pointerdown', (e) => {
       // Only primary mouse button or single touch
       if (e.button !== 0 && e.pointerType === 'mouse') return;
+      if (!cardEl._source && !cardEl._flipCard) return;
 
       pointerDownTime = Date.now();
       startX = e.clientX;
       startY = e.clientY;
-      isDragging = false;
 
-      this.potentialDrag = {
-        source,
-        element: cardEl,
-        startX,
-        startY,
-        pointerId: e.pointerId
-      };
+      if (cardEl._source) {
+        this.potentialDrag = {
+          source: cardEl._source,
+          element: cardEl,
+          startX,
+          startY,
+          pointerId: e.pointerId
+        };
 
-      // Ensure touch doesn't trigger scroll
-      cardEl.setPointerCapture(e.pointerId);
+        try {
+          cardEl.setPointerCapture(e.pointerId);
+        } catch (err) {}
+      }
     });
 
     cardEl.addEventListener('pointermove', (e) => {
-      if (!this.potentialDrag || this.potentialDrag.pointerId !== e.pointerId) return;
+      if (!this.potentialDrag || this.potentialDrag.pointerId !== e.pointerId || !cardEl._source) return;
 
       const dist = Math.hypot(e.clientX - startX, e.clientY - startY);
       if (dist > 8 && !this.dragState) {
@@ -442,30 +494,56 @@ class SolitaireUI {
     });
 
     cardEl.addEventListener('pointerup', (e) => {
-      if (!this.potentialDrag || this.potentialDrag.pointerId !== e.pointerId) return;
-
       const clickDuration = Date.now() - pointerDownTime;
       const dist = Math.hypot(e.clientX - startX, e.clientY - startY);
+
+      if (cardEl._flipCard && !cardEl._source) {
+        if (dist < 15 && clickDuration < 500) {
+          e.stopPropagation();
+          const card = cardEl._flipCard;
+          card.faceUp = true;
+          card.justFlipped = true;
+          sound.playCardFlip();
+          this.render();
+        }
+        return;
+      }
+
+      if (!this.potentialDrag || this.potentialDrag.pointerId !== e.pointerId) return;
 
       try {
         cardEl.releasePointerCapture(e.pointerId);
       } catch (err) {}
 
+      const activeSource = cardEl._source || this.potentialDrag.source;
       this.potentialDrag = null;
 
       if (this.dragState) {
         // Was dragging: finish drop
         this.finishDrag(e);
-      } else if (dist < 10 && clickDuration < 350) {
+      } else if (dist < 10 && clickDuration < 350 && activeSource) {
         // Tap / Click to Move!
-        this.handleCardClick(source);
+        this.handleCardClick(activeSource);
+      }
+    });
+
+    cardEl.addEventListener('pointercancel', (e) => {
+      try {
+        cardEl.releasePointerCapture(e.pointerId);
+      } catch (err) {}
+      if (this.potentialDrag && this.potentialDrag.pointerId === e.pointerId) {
+        this.potentialDrag = null;
+      }
+      if (this.dragState) {
+        this.cancelDrag();
       }
     });
 
     // Double-click / double-tap shortcut to instantly send to foundation
     cardEl.addEventListener('dblclick', (e) => {
+      if (!cardEl._source) return;
       e.preventDefault();
-      this.handleCardDoubleClick(source);
+      this.handleCardDoubleClick(cardEl._source);
     });
   }
 
@@ -558,7 +636,7 @@ class SolitaireUI {
     const cardUpOffset = isMobile ? 22 : 30;
 
     cardsToDrag.forEach((card, i) => {
-      const cEl = card.renderElement();
+      const cEl = card.cloneElement();
       cEl.style.top = `${i * cardUpOffset}px`;
       cEl.style.position = 'absolute';
       ghost.appendChild(cEl);
@@ -603,6 +681,7 @@ class SolitaireUI {
   }
 
   handlePointerCancel(e) {
+    this.potentialDrag = null;
     if (this.dragState) {
       this.cancelDrag();
     }
@@ -759,7 +838,8 @@ class SolitaireUI {
   async handleAutoComplete() {
     if (this.isAutoSolving) return;
     this.isAutoSolving = true;
-    this.autoCompleteBtn.style.display = 'none';
+    if (this.autoCompleteBtn) this.autoCompleteBtn.style.display = 'none';
+    if (this.autoCompleteMobileBtn) this.autoCompleteMobileBtn.style.display = 'none';
 
     while (this.engine.isWinnableAuto() && !this.engine.isWon()) {
       // Find a card that can move to foundation

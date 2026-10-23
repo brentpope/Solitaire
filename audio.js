@@ -6,6 +6,8 @@
 class SoundController {
   constructor() {
     this.ctx = null;
+    this.masterGain = null;
+    this.dealNoiseBuffer = null;
     this.muted = localStorage.getItem('solitaire_sound_muted') === 'true';
     this.volume = parseFloat(localStorage.getItem('solitaire_volume') || '0.5');
     this.unlocked = false;
@@ -13,8 +15,8 @@ class SoundController {
     // Listen to first user gesture to unlock Web Audio in Safari/iOS/Chrome
     const unlockAudio = () => {
       this.initContext();
-      if (this.ctx && this.ctx.state === 'suspended') {
-        this.ctx.resume();
+      if (this.ctx && (this.ctx.state === 'suspended' || this.ctx.state === 'interrupted')) {
+        this.ctx.resume().catch(() => {});
       }
       this.unlocked = true;
       ['click', 'touchstart', 'keydown'].forEach(evt => {
@@ -32,13 +34,29 @@ class SoundController {
       const AudioCtx = window.AudioContext || window.webkitAudioContext;
       if (AudioCtx) {
         this.ctx = new AudioCtx();
+        this.masterGain = this.ctx.createGain();
+        this.masterGain.gain.value = this.muted ? 0 : this.volume;
+        this.masterGain.connect(this.ctx.destination);
+
+        // Pre-allocate noise buffer once to avoid per-deal buffer allocations
+        const bufferSize = Math.floor(this.ctx.sampleRate * 0.08);
+        this.dealNoiseBuffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+        const data = this.dealNoiseBuffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) {
+          data[i] = (Math.random() * 2 - 1) * 0.4;
+        }
       }
+    } else if (this.ctx.state === 'suspended' || this.ctx.state === 'interrupted') {
+      this.ctx.resume().catch(() => {});
     }
   }
 
   setMuted(muted) {
     this.muted = !!muted;
     localStorage.setItem('solitaire_sound_muted', this.muted);
+    if (this.masterGain) {
+      this.masterGain.gain.value = this.muted ? 0 : this.volume;
+    }
   }
 
   toggleMute() {
@@ -49,14 +67,14 @@ class SoundController {
   setVolume(vol) {
     this.volume = Math.max(0, Math.min(1, vol));
     localStorage.setItem('solitaire_volume', this.volume);
+    if (this.masterGain) {
+      this.masterGain.gain.value = this.muted ? 0 : this.volume;
+    }
   }
 
   getMasterGain() {
-    if (!this.ctx) return null;
-    const gain = this.ctx.createGain();
-    gain.gain.value = this.muted ? 0 : this.volume;
-    gain.connect(this.ctx.destination);
-    return gain;
+    if (!this.ctx || !this.masterGain) return null;
+    return this.masterGain;
   }
 
   /**
@@ -65,22 +83,14 @@ class SoundController {
   playDeal() {
     if (this.muted) return;
     this.initContext();
-    if (!this.ctx) return;
+    if (!this.ctx || !this.dealNoiseBuffer) return;
 
     try {
       const master = this.getMasterGain();
       const now = this.ctx.currentTime;
 
-      // Filtered noise burst for paper friction
-      const bufferSize = this.ctx.sampleRate * 0.08;
-      const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
-      const data = buffer.getChannelData(0);
-      for (let i = 0; i < bufferSize; i++) {
-        data[i] = (Math.random() * 2 - 1) * 0.4;
-      }
-
       const noise = this.ctx.createBufferSource();
-      noise.buffer = buffer;
+      noise.buffer = this.dealNoiseBuffer;
 
       const filter = this.ctx.createBiquadFilter();
       filter.type = 'bandpass';
@@ -96,6 +106,12 @@ class SoundController {
       noise.connect(filter);
       filter.connect(gain);
       gain.connect(master);
+
+      noise.onended = () => {
+        noise.disconnect();
+        filter.disconnect();
+        gain.disconnect();
+      };
 
       noise.start(now);
       noise.stop(now + 0.08);
@@ -130,6 +146,11 @@ class SoundController {
       osc.connect(gain);
       gain.connect(master);
 
+      osc.onended = () => {
+        osc.disconnect();
+        gain.disconnect();
+      };
+
       osc.start(now);
       osc.stop(now + 0.07);
     } catch (e) {}
@@ -160,6 +181,11 @@ class SoundController {
 
       osc.connect(gain);
       gain.connect(master);
+
+      osc.onended = () => {
+        osc.disconnect();
+        gain.disconnect();
+      };
 
       osc.start(now);
       osc.stop(now + 0.07);
@@ -194,6 +220,10 @@ class SoundController {
 
       osc1.connect(gain1);
       gain1.connect(master);
+      osc1.onended = () => {
+        osc1.disconnect();
+        gain1.disconnect();
+      };
       osc1.start(now);
       osc1.stop(now + 0.45);
 
@@ -208,6 +238,10 @@ class SoundController {
 
       osc2.connect(gain2);
       gain2.connect(master);
+      osc2.onended = () => {
+        osc2.disconnect();
+        gain2.disconnect();
+      };
       osc2.start(now);
       osc2.stop(now + 0.3);
     } catch (e) {}
@@ -237,6 +271,11 @@ class SoundController {
 
       osc.connect(gain);
       gain.connect(master);
+
+      osc.onended = () => {
+        osc.disconnect();
+        gain.disconnect();
+      };
 
       osc.start(now);
       osc.stop(now + 0.16);
@@ -278,6 +317,11 @@ class SoundController {
 
         osc.connect(gain);
         gain.connect(master);
+
+        osc.onended = () => {
+          osc.disconnect();
+          gain.disconnect();
+        };
 
         osc.start(now + t);
         osc.stop(now + t + d);
