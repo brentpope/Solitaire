@@ -17,7 +17,7 @@
   <link rel="manifest" href="manifest.json">
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
 
-  <link rel="stylesheet" href="style.css?v=7">
+  <link rel="stylesheet" href="style.css?v=8">
 </head>
 <body class="theme-green">
 
@@ -204,7 +204,7 @@
         <div class="settings-usage">
           <label class="settings-usage-label" for="setting-usage-telemetry">
             <input id="setting-usage-telemetry" type="checkbox">
-            <span>Share usage counts</span>
+            <span>Share usage counts (recommended)</span>
           </label>
           <p>No name, email, or phone number is collected. A random Firebase ID helps count daily players and whether the game is opened from an installed app. You can stop future counts in Settings.</p>
         </div>
@@ -220,7 +220,7 @@
     </div>
   </div>
 
-  <!-- First-launch, optional usage-count consent -->
+  <!-- First-launch usage-count preference; sharing is enabled by default. -->
   <div id="usage-consent-modal" class="modal">
     <div class="modal-backdrop"></div>
     <div class="modal-content">
@@ -228,14 +228,13 @@
         <h2 class="modal-title">Help improve Solitaire</h2>
       </div>
       <div class="modal-body usage-consent-content">
-        <p>No name, email, or phone number is collected. If you agree, we record basic usage counts, including daily players and whether the game is opened from an installed app. A random Firebase ID is used to distinguish returning installations.</p>
+        <p>Usage counts are shared by default to help us understand daily play. No name, email, or phone number is collected. A random Firebase ID distinguishes returning installations. Uncheck the box to opt out; you can change this later in Settings.</p>
         <label class="settings-usage-label" for="usage-consent-checkbox">
-          <input id="usage-consent-checkbox" type="checkbox">
-          <span>I agree to share usage counts</span>
+          <input id="usage-consent-checkbox" type="checkbox" checked>
+          <span>Share usage counts</span>
         </label>
         <div class="usage-consent-actions">
-          <button id="btn-usage-consent-decline" class="btn" type="button">Continue without sharing</button>
-          <button id="btn-usage-consent-accept" class="btn btn-accent" type="button" disabled>Continue</button>
+          <button id="btn-usage-consent-accept" class="btn btn-accent" type="button">Continue</button>
         </div>
       </div>
     </div>
@@ -330,7 +329,7 @@
   <script src="audio.js?v=5"></script>
   <script src="engine.js?v=5"></script>
   <script src="win-animation.js?v=5"></script>
-  <script src="ui.js?v=7"></script>
+  <script src="ui.js?v=8"></script>
 
   <!-- Service Worker Registration for Offline PWA Play -->
   <script>

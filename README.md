@@ -12,9 +12,9 @@ Open [Klondike Solitaire](https://brentpope.github.io/Solitaire/) on your PC or 
 
 Watch the [illustrated iPhone install walkthrough](media/solitaire-iphone-install-guide.mp4).
 
-### Optional usage counts
+### Usage counts
 
-Solitaire asks before collecting basic usage counts. Players can decline and continue playing, or change their choice in Settings. With consent, Firebase Anonymous Authentication supplies a random app ID used to count daily active installations and whether the game was opened in standalone (installed) mode. The app does not send names, email addresses, phone numbers, page URLs, or user-agent strings. Counts are written to the `solitaire_usage` collection in the Blueprint Softphone Firebase project; installed-mode totals are estimates based on first-party app IDs, not browser-reported install events.
+Sharing basic usage counts is enabled by default. Uncheck the box on first launch to opt out, or change the setting later in Settings. Firebase Anonymous Authentication supplies a random app ID used to count daily active installations and whether the game was opened in standalone (installed) mode. The app does not send names, email addresses, phone numbers, page URLs, or user-agent strings. Counts are written to the `solitaire_usage` collection in the Blueprint Softphone Firebase project; installed-mode totals are estimates based on first-party app IDs, not browser-reported install events.
 
 ---
 
