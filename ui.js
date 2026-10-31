@@ -102,6 +102,13 @@ class SolitaireUI {
     if (this.autoCompleteMobileBtn) this.autoCompleteMobileBtn.addEventListener('click', () => this.handleAutoComplete());
     if (this.settingsBtn) this.settingsBtn.addEventListener('click', () => this.openModal('settings-modal'));
     if (this.shareMobileBtn) this.shareMobileBtn.addEventListener('click', () => this.openMobileShareModal());
+    const settingsShareMobileBtn = document.getElementById('btn-settings-share-mobile');
+    if (settingsShareMobileBtn) {
+      settingsShareMobileBtn.addEventListener('click', () => {
+        this.closeModal('settings-modal');
+        this.openMobileShareModal();
+      });
+    }
     if (this.soundToggleBtn) this.soundToggleBtn.addEventListener('click', () => this.toggleSound());
 
     // Stock pile click
@@ -935,7 +942,8 @@ class SolitaireUI {
     qrContainer.innerHTML = '';
 
     // Determine the best URL to connect from iPhone
-    let targetUrl = window.location.origin;
+    // Preserve the repository path when hosted from a GitHub Pages project site.
+    let targetUrl = new URL('./', window.location.href).href;
     if (this.networkInfo && this.networkInfo.ip) {
       targetUrl = `http://${this.networkInfo.ip}:${this.networkInfo.port || 8080}`;
     } else if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {

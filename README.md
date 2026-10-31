@@ -6,7 +6,15 @@ A modern, responsive, zero-dependency Klondike Solitaire game designed to play s
 
 ## 🚀 Quick Start
 
-### 1. Launch the Game Server
+### Play from GitHub Pages (no PC server required)
+
+Open [Klondike Solitaire](https://brentpope.github.io/Solitaire/) in a browser on your PC or iPhone. On iPhone, use Safari's Share button and choose **Add to Home Screen** to install it for full-screen and offline play. The **Settings → Show QR code for another iPhone** option shares the hosted game URL; it works from anywhere with internet access.
+
+### Play from your PC over local Wi-Fi
+
+Use this option if you want to serve a local copy instead of the GitHub Pages version.
+
+#### 1. Launch the Game Server
 From your terminal:
 
 ```bash
@@ -14,16 +22,16 @@ cd ~/Projects/solitaire
 ./start.sh
 ```
 
-### 2. Play on Desktop PC
+#### 2. Play on Desktop PC
 Open your web browser and navigate to:
 ```
 http://localhost:8080
 ```
 *(You can also double-click `index.html` to open it directly in any browser without running a server!)*
 
-### 3. Play on iPhone
-1. Make sure your iPhone is connected to the same Wi-Fi network as your PC (or connected to your Tailscale network).
-2. Look at the terminal output or click the **📱 Play on iPhone** button in the top navigation bar of the desktop game to show a scannable **QR Code**.
+#### 3. Play on iPhone
+1. Make sure your iPhone is connected to the same Wi-Fi network as your PC (or connected to your Tailscale network) when using this local server.
+2. Look at the terminal output or open **Settings → Show QR code for another iPhone** in the game to show a scannable **QR Code**. The header also has a QR shortcut.
 3. Open your iPhone Camera and scan the QR Code (or type the URL shown in terminal, e.g. `http://192.168.4.108:8080`).
 4. **Install as a Native App (Recommended):**
    - In Safari on your iPhone, tap the **Share** button (box with an arrow pointing up).

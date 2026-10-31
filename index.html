@@ -17,7 +17,7 @@
   <link rel="manifest" href="manifest.json">
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
 
-  <link rel="stylesheet" href="style.css?v=4">
+  <link rel="stylesheet" href="style.css?v=5">
 </head>
 <body class="theme-green">
 
@@ -201,6 +201,13 @@
             <option value="emerald">Emerald Casino Tartan</option>
           </select>
         </div>
+        <div class="settings-share">
+          <button id="btn-settings-share-mobile" class="btn settings-share-btn" type="button">
+            <span aria-hidden="true">📱</span>
+            <span>Show QR code for another iPhone</span>
+          </button>
+          <p>Scan with an iPhone to open the game in Safari. The GitHub Pages version works anywhere.</p>
+        </div>
       </div>
     </div>
   </div>
@@ -215,7 +222,7 @@
       </div>
       <div class="modal-body qr-container">
         <p class="qr-instructions">
-          Scan this QR code with your iPhone Camera to play immediately over your local Wi-Fi:
+          Scan this QR code with your iPhone Camera and tap the link to open the game in Safari. The GitHub Pages version works anywhere; a locally hosted copy requires the same Wi-Fi network.
         </p>
 
         <!-- QR Code renders here -->
@@ -272,11 +279,11 @@
 
   <!-- Scripts -->
   <script src="qrcode.min.js"></script>
-  <script src="cards.js?v=4"></script>
-  <script src="audio.js?v=4"></script>
-  <script src="engine.js?v=4"></script>
-  <script src="win-animation.js?v=4"></script>
-  <script src="ui.js?v=4"></script>
+  <script src="cards.js?v=5"></script>
+  <script src="audio.js?v=5"></script>
+  <script src="engine.js?v=5"></script>
+  <script src="win-animation.js?v=5"></script>
+  <script src="ui.js?v=5"></script>
 
   <!-- Service Worker Registration for Offline PWA Play -->
   <script>

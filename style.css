@@ -800,6 +800,26 @@ body {
   outline: none;
 }
 
+.settings-share {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 18px;
+}
+
+.settings-share-btn {
+  justify-content: center;
+  gap: 8px;
+  min-height: 42px;
+}
+
+.settings-share p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.68);
+  font-size: 0.82rem;
+  line-height: 1.4;
+}
+
 /* Mobile Share QR Container */
 .qr-container {
   display: flex;
