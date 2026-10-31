@@ -851,6 +851,21 @@ body {
   gap: 4px;
 }
 
+.qr-video-link {
+  display: inline-block;
+  margin-top: 12px;
+  color: #fbc02d;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.qr-video-link:focus-visible {
+  outline: 2px solid #fbc02d;
+  outline-offset: 4px;
+  border-radius: 2px;
+}
+
 .url-box {
   background: rgba(0, 0, 0, 0.4);
   padding: 8px 14px;
