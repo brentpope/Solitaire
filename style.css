@@ -820,6 +820,60 @@ body {
   line-height: 1.4;
 }
 
+.settings-about-btn {
+  align-self: flex-start;
+  margin-top: 8px;
+}
+
+.about-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  text-align: center;
+}
+
+.about-content p {
+  margin: 0;
+  max-width: 390px;
+  color: rgba(255, 255, 255, 0.86);
+  line-height: 1.5;
+}
+
+.about-logo {
+  width: 54px;
+  height: 54px;
+  display: grid;
+  place-items: center;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.12);
+  color: #fbc02d;
+  font-size: 34px;
+}
+
+.about-softphone-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 4px;
+  padding: 10px 16px;
+  border-radius: 9px;
+  background: #fbc02d;
+  color: #172015;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.about-softphone-link:hover {
+  background: #ffda55;
+}
+
+.about-softphone-link:focus-visible {
+  outline: 2px solid #ffffff;
+  outline-offset: 3px;
+}
+
 /* Mobile Share QR Container */
 .qr-container {
   display: flex;

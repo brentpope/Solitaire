@@ -109,6 +109,13 @@ class SolitaireUI {
         this.openMobileShareModal();
       });
     }
+    const aboutBtn = document.getElementById('btn-settings-about');
+    if (aboutBtn) {
+      aboutBtn.addEventListener('click', () => {
+        this.closeModal('settings-modal');
+        this.openModal('about-modal');
+      });
+    }
     if (this.soundToggleBtn) this.soundToggleBtn.addEventListener('click', () => this.toggleSound());
 
     // Stock pile click
