@@ -89,6 +89,7 @@ class SolitaireUI {
     this.applyCardBack(this.cardBack);
     this.updateSoundButton();
     this.setupEventListeners();
+    this.setupUsageTelemetryConsent();
     this.startNewGame();
     this.setupNetworkInfo();
   }
@@ -175,6 +176,14 @@ class SolitaireUI {
       cardBackSelect.value = this.cardBack;
       cardBackSelect.addEventListener('change', (e) => {
         this.applyCardBack(e.target.value);
+      });
+    }
+
+    const usageCheckbox = document.getElementById('setting-usage-telemetry');
+    if (usageCheckbox) {
+      usageCheckbox.checked = localStorage.getItem('solitaire_usage_consent') === 'true';
+      usageCheckbox.addEventListener('change', () => {
+        this.setUsageTelemetryConsent(usageCheckbox.checked);
       });
     }
 
@@ -924,6 +933,59 @@ class SolitaireUI {
   closeModal(modalId) {
     const modal = document.getElementById(modalId);
     if (modal) modal.classList.remove('active');
+  }
+
+  setupUsageTelemetryConsent() {
+    const consent = localStorage.getItem('solitaire_usage_consent');
+    const promptShown = localStorage.getItem('solitaire_usage_consent_prompted') === 'true';
+    const consentCheckbox = document.getElementById('usage-consent-checkbox');
+    const acceptButton = document.getElementById('btn-usage-consent-accept');
+    const declineButton = document.getElementById('btn-usage-consent-decline');
+    const settingsCheckbox = document.getElementById('setting-usage-telemetry');
+
+    if (consentCheckbox && acceptButton) {
+      consentCheckbox.addEventListener('change', () => {
+        acceptButton.disabled = !consentCheckbox.checked;
+      });
+      acceptButton.addEventListener('click', () => {
+        localStorage.setItem('solitaire_usage_consent_prompted', 'true');
+        if (settingsCheckbox) settingsCheckbox.checked = true;
+        this.setUsageTelemetryConsent(true);
+        this.closeModal('usage-consent-modal');
+      });
+    }
+
+    if (declineButton) {
+      declineButton.addEventListener('click', () => {
+        localStorage.setItem('solitaire_usage_consent_prompted', 'true');
+        if (settingsCheckbox) settingsCheckbox.checked = false;
+        this.setUsageTelemetryConsent(false);
+        this.closeModal('usage-consent-modal');
+      });
+    }
+
+    if (consent === 'true') {
+      this.recordUsageCounts();
+    } else if (consent === null && !promptShown) {
+      this.openModal('usage-consent-modal');
+    }
+  }
+
+  setUsageTelemetryConsent(enabled) {
+    localStorage.setItem('solitaire_usage_consent', String(enabled));
+    if (enabled) this.recordUsageCounts();
+  }
+
+  async recordUsageCounts() {
+    if (localStorage.getItem('solitaire_usage_consent') !== 'true' || !navigator.onLine) return;
+    const standalone = window.matchMedia('(display-mode: standalone)').matches
+      || window.navigator.standalone === true;
+    try {
+      const { recordUsageCounts } = await import('./telemetry.js');
+      await recordUsageCounts(standalone);
+    } catch {
+      // Telemetry is best-effort and never blocks or interrupts the game.
+    }
   }
 
   /**

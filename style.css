@@ -825,6 +825,52 @@ body {
   margin-top: 8px;
 }
 
+.settings-usage {
+  margin-top: 16px;
+  padding: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.12);
+}
+
+.settings-usage-label {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  color: rgba(255, 255, 255, 0.92);
+  line-height: 1.4;
+  cursor: pointer;
+}
+
+.settings-usage-label input {
+  width: 18px;
+  height: 18px;
+  margin: 1px 0 0;
+  accent-color: #65c878;
+  flex: 0 0 auto;
+}
+
+.settings-usage p,
+.usage-consent-content > p {
+  margin: 8px 0 0;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+.usage-consent-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.usage-consent-actions button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .about-content {
   display: flex;
   flex-direction: column;
