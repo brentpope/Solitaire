@@ -436,29 +436,39 @@ body {
   height: 100%;
 }
 
-/* Optional accessibility mode enlarges ranks and suit marks within each card. */
-.large-card-symbols .card-corner {
-  width: calc(var(--card-width) * 0.38);
+/* Large-print mode uses a single rank and suit mark instead of pip grids. */
+.large-print-face {
+  display: none;
 }
 
-.large-card-symbols .corner-rank {
-  font-size: calc(var(--card-width) * 0.32);
-  letter-spacing: -1px;
+.large-card-symbols .card-corner,
+.large-card-symbols .card-center {
+  display: none !important;
 }
 
-.large-card-symbols .corner-suit {
-  width: calc(var(--card-width) * 0.25);
-  height: calc(var(--card-width) * 0.25);
+.large-card-symbols .large-print-face {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: calc(var(--card-width) * 0.025);
+  pointer-events: none;
 }
 
-.large-card-symbols .pip svg {
-  width: calc(var(--card-width) * 0.22);
-  height: calc(var(--card-width) * 0.22);
+.large-print-rank {
+  font-size: calc(var(--card-width) * 0.62);
+  font-weight: 900;
+  line-height: 0.88;
+  letter-spacing: -1.5px;
 }
 
-.large-card-symbols .pip-layout-ace .ace-pip svg {
-  width: calc(var(--card-width) * 0.52);
-  height: calc(var(--card-width) * 0.52);
+.large-print-suit,
+.large-print-suit svg {
+  display: block;
+  width: calc(var(--card-width) * 0.34);
+  height: calc(var(--card-width) * 0.34);
 }
 
 .card-center {

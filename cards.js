@@ -233,6 +233,10 @@ class Card {
         ${centerHTML}
       </div>
       ${cornerBottom}
+      <div class="large-print-face" aria-hidden="true">
+        <span class="large-print-rank">${rankStr}</span>
+        <span class="large-print-suit">${suitSvg}</span>
+      </div>
     `;
   }
 

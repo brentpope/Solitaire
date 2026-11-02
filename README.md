@@ -10,7 +10,7 @@ A modern, responsive, zero-dependency Klondike Solitaire game designed to play s
 
 Open [Klondike Solitaire](https://brentpope.github.io/Solitaire/) on your PC or iPhone. On iPhone, open the link in Safari, tap **Share → Add to Home Screen → Add** to install it for full-screen and offline play. From the game, use **Settings → Show QR code for another iPhone** to open it on another iPhone.
 
-For more legible cards, open **Settings** and enable **Larger card numbers and suits**. This enlarges the rank and suit marks while keeping the seven cards fitted across the board.
+For more legible cards, open **Settings** and enable **Large-print cards (one suit symbol)**. Each card then shows a large rank and one centered suit symbol instead of a repeated pip pattern, while keeping all seven cards fitted across the board.
 
 Watch the [illustrated iPhone install walkthrough](media/solitaire-iphone-install-guide.mp4).
 
