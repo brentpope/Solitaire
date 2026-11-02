@@ -527,39 +527,60 @@ body {
 
 .large-card-symbols .tableau-column .large-print-repeat {
   position: absolute;
-  top: 59%;
+  top: 55%;
   left: 50%;
   transform: translateX(-50%);
+  width: 92%;
+  height: 42%;
+  box-sizing: border-box;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: calc(var(--card-width) * 0.025);
-  padding: calc(var(--card-width) * 0.025) calc(var(--card-width) * 0.05);
-  border: 1px solid rgba(151, 123, 54, 0.34);
-  border-radius: calc(var(--card-radius) * 0.72);
-  background: linear-gradient(145deg, rgba(246, 238, 211, 0.88), rgba(232, 217, 178, 0.72));
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.82), 0 1px 2px rgba(79, 58, 14, 0.12);
+  gap: calc(var(--card-width) * 0.03);
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
   z-index: 1;
 }
 
-.large-print-repeat-suit,
+.large-print-repeat-suit {
+  position: relative;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: calc(var(--card-width) * 0.52);
+  height: calc(var(--card-width) * 0.52);
+}
+
+.large-print-repeat-suit::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: 1px solid rgba(151, 123, 54, 0.3);
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(230, 214, 167, 0.38), rgba(250, 246, 232, 0.08) 70%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85);
+}
+
 .large-print-repeat-suit svg {
+  position: relative;
+  z-index: 1;
   display: block;
-  width: calc(var(--card-width) * 0.37);
-  height: calc(var(--card-width) * 0.37);
+  width: calc(var(--card-width) * 0.42);
+  height: calc(var(--card-width) * 0.42);
+  filter: drop-shadow(0 1px 0 rgba(255, 255, 255, 0.8));
 }
 
 .large-print-repeat-rank {
-  min-width: calc(var(--card-width) * 0.27);
-  padding: calc(var(--card-width) * 0.015) calc(var(--card-width) * 0.035);
-  border: 1px solid rgba(151, 123, 54, 0.26);
-  border-radius: calc(var(--card-radius) * 0.42);
-  background: rgba(255, 255, 255, 0.64);
-  font-size: calc(var(--card-width) * 0.28);
+  padding-left: calc(var(--card-width) * 0.045);
+  border-left: 1px solid rgba(151, 123, 54, 0.34);
+  font-size: calc(var(--card-width) * 0.30);
   font-weight: 900;
-  line-height: 0.92;
+  line-height: 1;
   letter-spacing: -0.8px;
   text-align: center;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.9);
 }
 
 .card-center {
@@ -894,6 +915,54 @@ body {
 
 .modal-close:hover {
   color: #fff;
+}
+
+#settings-modal .modal-content {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100vh - 24px);
+  max-height: calc(100dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px) - 24px);
+  padding: 16px 20px;
+}
+
+#settings-modal .modal-header {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  flex: 0 0 auto;
+  padding: 4px 0 10px;
+  margin-bottom: 8px;
+  background: #1e242b;
+}
+
+#settings-modal .modal-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  padding: 0 4px 8px 0;
+}
+
+#settings-modal .settings-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  min-width: 78px;
+  min-height: 44px;
+  padding: 6px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  font-size: 0.85rem;
+}
+
+.settings-close-icon {
+  font-size: 1.35rem;
+  line-height: 1;
 }
 
 .modal-body {
