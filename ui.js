@@ -77,6 +77,7 @@ class SolitaireUI {
     // Theme preferences
     this.theme = localStorage.getItem('solitaire_theme') || 'green';
     this.cardBack = localStorage.getItem('solitaire_card_back') || 'red';
+    this.largeCardSymbols = localStorage.getItem('solitaire_large_card_symbols') === 'true';
 
     // Auto complete running flag
     this.isAutoSolving = false;
@@ -87,6 +88,7 @@ class SolitaireUI {
   init() {
     this.applyTheme(this.theme);
     this.applyCardBack(this.cardBack);
+    this.applyLargeCardSymbols(this.largeCardSymbols);
     this.updateSoundButton();
     this.setupEventListeners();
     this.setupUsageTelemetryConsent();
@@ -179,6 +181,14 @@ class SolitaireUI {
       });
     }
 
+    const largeSymbolsCheckbox = document.getElementById('setting-large-card-symbols');
+    if (largeSymbolsCheckbox) {
+      largeSymbolsCheckbox.checked = this.largeCardSymbols;
+      largeSymbolsCheckbox.addEventListener('change', () => {
+        this.applyLargeCardSymbols(largeSymbolsCheckbox.checked);
+      });
+    }
+
     const usageCheckbox = document.getElementById('setting-usage-telemetry');
     if (usageCheckbox) {
       usageCheckbox.checked = localStorage.getItem('solitaire_usage_consent') !== 'false';
@@ -243,13 +253,20 @@ class SolitaireUI {
   applyTheme(theme) {
     this.theme = theme;
     localStorage.setItem('solitaire_theme', theme);
-    document.body.className = `theme-${theme}`;
+    document.body.classList.remove('theme-green', 'theme-blue', 'theme-burgundy', 'theme-dark');
+    document.body.classList.add(`theme-${theme}`);
   }
 
   applyCardBack(cardBack) {
     this.cardBack = cardBack;
     localStorage.setItem('solitaire_card_back', cardBack);
     document.documentElement.setAttribute('data-card-back', cardBack);
+  }
+
+  applyLargeCardSymbols(enabled) {
+    this.largeCardSymbols = Boolean(enabled);
+    localStorage.setItem('solitaire_large_card_symbols', String(this.largeCardSymbols));
+    document.body.classList.toggle('large-card-symbols', this.largeCardSymbols);
   }
 
   toggleSound() {
