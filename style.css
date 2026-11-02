@@ -446,6 +446,21 @@ body {
   display: none !important;
 }
 
+.large-card-symbols .card-front {
+  background: linear-gradient(145deg, #fffdf5 0%, #fffefa 52%, #f4efdf 100%);
+  border-color: #c7b985;
+}
+
+.large-card-symbols .card-front::after {
+  content: '';
+  position: absolute;
+  inset: 3px;
+  border: 1px solid rgba(151, 123, 54, 0.34);
+  border-radius: calc(var(--card-radius) * 0.62);
+  pointer-events: none;
+  z-index: 0;
+}
+
 .large-card-symbols .large-print-face {
   position: absolute;
   inset: 0;
@@ -455,6 +470,7 @@ body {
   justify-content: center;
   gap: calc(var(--card-width) * 0.025);
   pointer-events: none;
+  z-index: 1;
 }
 
 .large-print-rank {
@@ -480,15 +496,29 @@ body {
   padding: calc(var(--card-width) * 0.015) calc(var(--card-width) * 0.05);
 }
 
+.large-card-symbols .tableau-column .large-print-face::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  height: calc(var(--card-width) * 0.40);
+  background: linear-gradient(90deg, rgba(230, 214, 167, 0.46), rgba(250, 246, 232, 0.24));
+  border-bottom: 1px solid rgba(151, 123, 54, 0.18);
+  z-index: 0;
+}
+
 .large-card-symbols .tableau-column .large-print-rank {
   font-size: calc(var(--card-width) * 0.36);
   letter-spacing: -1px;
+  position: relative;
+  z-index: 1;
 }
 
 .large-card-symbols .tableau-column .large-print-suit,
 .large-card-symbols .tableau-column .large-print-suit svg {
   width: calc(var(--card-width) * 0.22);
   height: calc(var(--card-width) * 0.22);
+  position: relative;
+  z-index: 1;
 }
 
 .card-center {
