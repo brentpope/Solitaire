@@ -2,7 +2,7 @@
  * sw.js - Service Worker for Klondike Solitaire PWA (100% Offline Play)
  */
 
-const CACHE_NAME = 'solitaire-v12';
+const CACHE_NAME = 'solitaire-v13';
 const ASSETS_TO_CACHE = [
   './',
   'index.html',

@@ -236,6 +236,10 @@ class Card {
       <div class="large-print-face" aria-hidden="true">
         <span class="large-print-rank">${rankStr}</span>
         <span class="large-print-suit">${suitSvg}</span>
+        <span class="large-print-repeat">
+          <span class="large-print-repeat-rank">${rankStr}</span>
+          <span class="large-print-repeat-suit">${suitSvg}</span>
+        </span>
       </div>
     `;
   }
