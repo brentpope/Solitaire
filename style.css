@@ -458,7 +458,7 @@ body {
 }
 
 .large-print-rank {
-  font-size: calc(var(--card-width) * 0.62);
+  font-size: calc(var(--card-width) * 0.56);
   font-weight: 900;
   line-height: 0.88;
   letter-spacing: -1.5px;
@@ -467,8 +467,28 @@ body {
 .large-print-suit,
 .large-print-suit svg {
   display: block;
-  width: calc(var(--card-width) * 0.34);
-  height: calc(var(--card-width) * 0.34);
+  width: calc(var(--card-width) * 0.30);
+  height: calc(var(--card-width) * 0.30);
+}
+
+/* Keep the rank and single suit in the exposed strip of stacked tableau cards. */
+.large-card-symbols .tableau-column .large-print-face {
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: calc(var(--card-width) * 0.015);
+  padding: calc(var(--card-width) * 0.015) calc(var(--card-width) * 0.05);
+}
+
+.large-card-symbols .tableau-column .large-print-rank {
+  font-size: calc(var(--card-width) * 0.36);
+  letter-spacing: -1px;
+}
+
+.large-card-symbols .tableau-column .large-print-suit,
+.large-card-symbols .tableau-column .large-print-suit svg {
+  width: calc(var(--card-width) * 0.22);
+  height: calc(var(--card-width) * 0.22);
 }
 
 .card-center {
